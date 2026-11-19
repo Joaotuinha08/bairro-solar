@@ -1,0 +1,10 @@
+{
+  "showVaultName": true,
+  "showCurrentFileName": false,
+  "showPopups": true,
+  "customVaultName": "Johnny's Workplace",
+  "showFileExtension": false,
+  "useLoadedTime": false,
+  "connectOnStart": true,
+  "autoHideStatusBar": true
+}

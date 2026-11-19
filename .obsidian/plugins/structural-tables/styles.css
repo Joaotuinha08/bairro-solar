@@ -1,0 +1,869 @@
+/* Owned blocks stay inside the text column even when a theme widens table blocks. */
+:is(.markdown-source-view, .markdown-preview-view).is-readable-line-width {
+  --structural-table-content-width: var(--line-width, var(--file-line-width, 100%));
+  --structural-table-content-max-width: var(--max-width, 100%);
+  --structural-table-content-margin: var(--content-margin-start, auto);
+}
+
+@layer structural-tables-layout {
+  .markdown-source-view.mod-cm6 .cm-content > .structural-tables-live-preview,
+  .markdown-preview-view .markdown-preview-sizer > div.structural-tables-reading-section {
+    box-sizing: border-box;
+    width: var(--structural-table-content-width, 100%) !important;
+    max-width: var(--structural-table-content-max-width, 100%) !important;
+    margin-inline: var(--structural-table-content-margin, 0) !important;
+    padding-inline: var(--structural-table-control-inset, 0) 0 !important;
+  }
+}
+
+.structural-tables-container {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Export stages are measured in the host theme, outside the visible viewport. */
+.structural-tables-image-stage {
+  position: fixed !important;
+  inset: 0 auto auto -100000px !important;
+  width: max-content !important;
+  height: auto !important;
+  overflow: visible !important;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-family: var(--font-text);
+  font-size: var(--font-text-size);
+  pointer-events: none;
+}
+
+.structural-tables-image-scope {
+  display: block !important;
+  position: static !important;
+  inset: auto !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  contain: none !important;
+  content-visibility: visible !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.structural-tables-image-snapshot {
+  box-sizing: border-box;
+  width: max-content !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 16px;
+}
+
+.structural-tables-image-snapshot .structural-tables-table {
+  width: max-content !important;
+  max-width: none !important;
+  table-layout: auto !important;
+  margin: 0 !important;
+}
+
+.structural-tables-image-snapshot :is(th, td, .structural-tables-cell-content, p, pre) {
+  max-width: none !important;
+  max-height: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.structural-tables-image-preview {
+  max-height: 60vh;
+  overflow: auto;
+  margin-block: 1rem;
+}
+
+.structural-tables-image-preview img { display: block; max-width: 100%; height: auto; }
+.structural-tables-image-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Interface language never changes source previews or a note's table direction. */
+.structural-tables-bidi-isolate { unicode-bidi: isolate; }
+
+[data-structural-interface] pre {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+[data-structural-interface] code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+[data-structural-interface] .structural-tables-recovered-draft {
+  unicode-bidi: isolate;
+}
+
+
+.structural-tables-live-preview {
+  --structural-table-handle-gutter: 1.25rem;
+  position: relative;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+  padding-block-end: var(--structural-table-handle-gutter);
+}
+
+.structural-tables-live-preview > .structural-tables-container {
+  box-sizing: border-box;
+  width: calc(100% - var(--structural-table-handle-gutter));
+  margin-inline-end: var(--structural-table-handle-gutter);
+}
+
+/* Native Callout content clips its children; keep control gutters inside it. */
+.callout .structural-tables-live-preview {
+  box-sizing: border-box;
+  padding-inline-start: var(--structural-table-handle-gutter);
+}
+
+/* Keep column controls within the table box so external captions can follow it. */
+.structural-tables-live-preview .structural-tables-table {
+  margin-block-start: 0 !important;
+}
+
+.structural-tables-live-preview .structural-tables-control-gutter {
+  caption-side: top;
+  height: var(--structural-table-handle-gutter);
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.structural-tables-live-preview > button.structural-tables-add-row,
+.structural-tables-live-preview > button.structural-tables-add-column {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-s);
+  box-shadow: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-ui-medium);
+  cursor: var(--cursor, default);
+  touch-action: manipulation;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.structural-tables-add-row { height: var(--structural-table-handle-gutter); }
+.structural-tables-add-column { width: var(--structural-table-handle-gutter); }
+
+/* Keep the gutter and keyboard order stable while idle controls are hidden. */
+@media (hover: hover) and (pointer: fine) {
+  .structural-tables-live-preview:is(:hover, :focus-within) > button:is(.structural-tables-add-row, .structural-tables-add-column) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .structural-tables-live-preview.is-add-controls-active > button:is(.structural-tables-add-row, .structural-tables-add-column) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.structural-tables-live-preview > button:is(.structural-tables-add-row, .structural-tables-add-column):focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.structural-tables-live-preview > button:is(.structural-tables-add-row, .structural-tables-add-column):is(:hover, :focus-visible) {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.structural-tables-add-row:focus-visible,
+.structural-tables-add-column:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+/* Obsidian's widget paint containment would clip the interactive outer gutter. */
+.markdown-source-view.mod-cm6 .cm-content > .structural-tables-live-preview[contenteditable="false"] {
+  contain: layout style !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-layout="pane"] {
+  --structural-table-width: 100%;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-layout="content-left"] {
+  --structural-table-width: auto;
+  --structural-table-margin: 0;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-layout="content-center"] {
+  --structural-table-width: auto;
+  --structural-table-margin: auto;
+}
+
+.structural-tables-table {
+  /* Preserve theme typography and cell decoration; bound sizing to the owned scroller. */
+  width: var(--structural-table-width, var(--table-width, auto)) !important;
+  min-width: 0 !important;
+  margin-inline: var(--structural-table-margin, 0) !important;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Rebind the inherited header color after Callout changes its table border color. */
+.callout .structural-tables-table {
+  --table-header-border-color: var(--table-border-color);
+}
+
+/* Rows own the size floor, including rows entirely covered by spanning cells. */
+.structural-tables-table tr {
+  height: max(1lh, var(--structural-table-row-height, 2rem), var(--structural-table-touch-row-height, 0px), var(--structural-table-edit-row-height, 0px));
+}
+
+.structural-tables-container.markdown-rendered .structural-tables-table [data-structural-column] {
+  position: relative;
+  padding: var(--table-cell-padding, 4px 8px);
+  border-inline-start-width: var(--table-border-width, 1px);
+  border-inline-end-width: var(--table-border-width, 1px);
+}
+
+/* DOM first/last-child is not a logical edge when rowspans cover adjacent slots. */
+.structural-tables-container.markdown-rendered .structural-tables-table [data-structural-column="0"] {
+  border-inline-start-width: var(--table-column-first-border-width, var(--table-border-width, 1px));
+  padding-inline-start: var(--table-edge-cell-padding-first, 8px);
+}
+
+.structural-tables-container.markdown-rendered .structural-tables-table [data-structural-inline-end="true"] {
+  border-inline-end-width: var(--table-column-last-border-width, var(--table-border-width, 1px));
+  padding-inline-end: var(--table-edge-cell-padding-last, 8px);
+}
+
+.structural-tables-container.markdown-rendered .structural-tables-table [data-structural-block-end="true"] {
+  border-block-end-width: var(--table-row-last-border-width, var(--table-border-width, 1px));
+}
+
+/* The theme's top outer edge also applies when there is no column-header section. */
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table [data-structural-row="0"] {
+  border-block-start-width: var(--table-header-border-width, var(--table-border-width, 1px));
+}
+
+.structural-tables-theme-probe {
+  position: fixed !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  inset: 0 auto auto 0 !important;
+}
+
+/* Only repair logical outer corners when runtime resolved a real theme radius.
+   Guarding with ready flags avoids invalid-at-computed-value-time var() rules
+   unexpectedly clearing hard-coded, non-token-based theme corner styling. */
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-start-start="true"][data-structural-ready-start-start="true"] [data-structural-corner-start-start="true"] {
+  border-start-start-radius: var(--structural-tables-corner-start-start) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-start-start="true"][data-structural-ready-start-start="true"] :is(thead, tbody) > tr > :is(th, td):not([data-structural-corner-start-start="true"]) {
+  border-start-start-radius: 0 !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-start-end="true"][data-structural-ready-start-end="true"] [data-structural-corner-start-end="true"] {
+  border-start-end-radius: var(--structural-tables-corner-start-end) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-start-end="true"][data-structural-ready-start-end="true"] :is(thead, tbody) > tr > :is(th, td):not([data-structural-corner-start-end="true"]) {
+  border-start-end-radius: 0 !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-end-start="true"][data-structural-ready-end-start="true"] [data-structural-corner-end-start="true"] {
+  border-end-start-radius: var(--structural-tables-corner-end-start) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-end-start="true"][data-structural-ready-end-start="true"] :is(thead, tbody) > tr > :is(th, td):not([data-structural-corner-end-start="true"]) {
+  border-end-start-radius: 0 !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-end-end="true"][data-structural-ready-end-end="true"] [data-structural-corner-end-end="true"] {
+  border-end-end-radius: var(--structural-tables-corner-end-end) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="theme"] .structural-tables-table[data-structural-remap-end-end="true"][data-structural-ready-end-end="true"] :is(thead, tbody) > tr > :is(th, td):not([data-structural-corner-end-end="true"]) {
+  border-end-end-radius: 0 !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="grid"] .structural-tables-table {
+  border-collapse: collapse !important;
+  border: var(--table-border-width, 1px) solid var(--table-border-color, var(--background-modifier-border)) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="grid"] .structural-tables-table :is(th, td) {
+  border: var(--table-border-width, 1px) solid var(--table-border-color, var(--background-modifier-border)) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="grid"] .structural-tables-table th {
+  background: var(--table-header-background, var(--background-secondary)) !important;
+  font-weight: var(--font-semibold, 600);
+}
+
+/* Emphasize complete header regions, including the edges of spanning anchors. */
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="grid"] .structural-tables-table [data-structural-header-end="true"] {
+  border-block-end-width: 2px !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="grid"] .structural-tables-table [data-structural-row-header-boundary="true"] {
+  border-inline-end-width: 2px !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="three-line"] .structural-tables-table {
+  border-collapse: collapse !important;
+  border: 0 !important;
+  border-block: 2px solid var(--text-normal) !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="three-line"] .structural-tables-table :is(th, td) {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="three-line"] .structural-tables-table th {
+  font-weight: var(--font-semibold, 600);
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="three-line"] .structural-tables-table thead {
+  border-block-end: 1px solid var(--text-normal) !important;
+}
+
+/* Group rules follow logical spans; leave gaps between adjacent column groups. */
+:is(.structural-tables-container, .structural-tables-live-preview)[data-appearance="three-line"] .structural-tables-table thead th[colspan][data-structural-header-end="false"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.5em;
+  inset-block-end: 0;
+  border-block-end: 1px solid var(--text-muted);
+  pointer-events: none;
+}
+
+.structural-tables-row-handle,
+.structural-tables-column-handle {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-faint);
+  line-height: 1;
+  cursor: var(--cursor, default);
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.structural-tables-row-handle.is-selected,
+.structural-tables-column-handle.is-selected { cursor: grab; }
+
+.structural-tables-column-handle[hidden] { display: none; }
+
+.structural-tables-live-preview[data-reorder-state="allowed"],
+.structural-tables-live-preview[data-reorder-state="allowed"] button { cursor: grabbing; }
+
+.structural-tables-live-preview[data-reorder-state="blocked"],
+.structural-tables-live-preview[data-reorder-state="blocked"] button { cursor: not-allowed; }
+
+.structural-tables-drop-line {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  background: var(--interactive-accent);
+}
+
+.structural-tables-drop-hint {
+  position: absolute;
+  z-index: 5;
+  max-inline-size: min(20rem, calc(100% - 1rem));
+  padding: var(--size-2-1) var(--size-4-2);
+  border: 1px solid var(--text-error);
+  border-radius: var(--radius-s);
+  background: var(--background-primary-alt);
+  box-shadow: var(--shadow-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-smaller);
+  line-height: var(--line-height-tight);
+  pointer-events: none;
+}
+
+.structural-tables-drop-hint[hidden] { display: none; }
+
+.structural-tables-live-preview[data-reorder-state="blocked"] .structural-tables-drop-line {
+  background: var(--text-error);
+}
+
+.structural-tables-row-handle:hover,
+.structural-tables-column-handle:hover,
+.structural-tables-row-handle.is-revealed,
+.structural-tables-column-handle.is-revealed,
+.structural-tables-row-handle:focus-visible,
+.structural-tables-column-handle:focus-visible,
+.structural-tables-row-handle.is-selected,
+.structural-tables-column-handle.is-selected {
+  opacity: 1;
+}
+
+.structural-tables-row-handle:hover,
+.structural-tables-column-handle:hover,
+.structural-tables-row-handle.is-revealed,
+.structural-tables-column-handle.is-revealed,
+.structural-tables-row-handle:focus-visible,
+.structural-tables-column-handle:focus-visible,
+.structural-tables-row-handle.is-selected,
+.structural-tables-column-handle.is-selected {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.structural-tables-row-handle:focus-visible,
+.structural-tables-column-handle:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.structural-tables-row-handle {
+  inset-inline-start: calc(-1 * var(--structural-table-handle-gutter));
+  width: 1.25rem;
+  height: 1.5rem;
+  transform: translateY(-50%);
+}
+
+.structural-tables-column-handle {
+  inset-block-start: 0;
+  width: 1.5rem;
+  height: 1.25rem;
+  transform: translateX(-50%);
+}
+
+/* A shared content layer sizes every cell, including empty cells and active drafts. */
+.structural-tables-cell-content {
+  min-block-size: 1lh;
+}
+
+.structural-tables-table :is(th, td).is-editing > .structural-tables-cell-content {
+  visibility: hidden;
+}
+
+.structural-tables-cell-editor {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-inline-size: 0;
+  min-height: 1lh;
+  margin: 0;
+  padding: inherit;
+  resize: none;
+  overflow-y: var(--structural-table-editor-overflow-y, hidden);
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--text-normal);
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+}
+
+.structural-tables-live-preview .structural-tables-table.is-interactive :is(th, td) {
+  cursor: default;
+}
+
+.structural-tables-live-preview .structural-tables-table.is-interactive :is(th, td):focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.structural-tables-live-preview .structural-tables-table :is(th, td).is-selected:not(.is-editing) {
+  background: var(--table-selection, var(--background-modifier-hover));
+  box-shadow: inset 0 0 0 var(--table-selection-border-width, 1px)
+    var(--table-selection-border-color, var(--interactive-accent));
+}
+
+.structural-tables-live-preview[data-appearance="grid"] .structural-tables-table :is(th, td).is-selected:not(.is-editing),
+.structural-tables-live-preview[data-appearance="three-line"] .structural-tables-table :is(th, td).is-selected:not(.is-editing) {
+  background: var(--table-selection, var(--background-modifier-hover)) !important;
+}
+
+.structural-tables-live-preview .structural-tables-table :is(th, td):focus-visible.is-selected:not(.is-editing) {
+  box-shadow: inset 0 0 0 max(2px, var(--table-selection-border-width, 1px))
+    var(--table-selection-border-color, var(--interactive-accent));
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-density="comfortable"] {
+  --structural-table-row-height: 2.5rem;
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-density="comfortable"] .structural-tables-table [data-structural-column] {
+  padding: var(--size-4-2) var(--size-4-3);
+}
+
+:is(.structural-tables-container, .structural-tables-live-preview)[data-density="compact"] .structural-tables-table [data-structural-column] {
+  padding: var(--size-2-1) var(--size-4-2);
+}
+
+.structural-tables-table th:is([scope="row"], [scope="rowgroup"]):not([data-align]) {
+  text-align: start;
+}
+
+.structural-tables-table :is(p, ul, ol) {
+  margin-block: 0;
+}
+
+.structural-tables-table [data-align="left"] {
+  text-align: left;
+}
+
+.structural-tables-table [data-align="center"] {
+  text-align: center;
+}
+
+.structural-tables-table [data-align="right"] {
+  text-align: right;
+}
+
+[data-zebra="true"] .structural-tables-table tbody tr:nth-child(even) {
+  background: var(--table-row-alt-background);
+}
+
+.structural-tables-invalid {
+  box-shadow: inset 3px 0 var(--color-red);
+}
+
+.structural-tables-settings-tabs {
+  display: flex;
+  max-inline-size: 100%;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--size-2-1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  margin: 0;
+  padding: 0;
+  border-block-end: 1px solid var(--background-modifier-border);
+  scrollbar-width: thin;
+}
+
+.structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 0;
+  box-sizing: border-box;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: var(--cursor, default);
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: var(--font-ui-small);
+  font-weight: inherit;
+  block-size: auto;
+  min-block-size: 34px;
+  margin: 0 0 -1px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab:hover {
+  background: transparent;
+  color: var(--text-normal);
+}
+
+.structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab.is-active,
+.structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab.is-active:hover {
+  background: transparent;
+  border-block-end-color: var(--interactive-accent);
+  color: var(--text-normal);
+  font-weight: var(--font-semibold);
+}
+
+.structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.structural-tables-settings-panel {
+  margin-block-start: var(--size-4-5);
+  min-inline-size: 0;
+}
+
+.structural-tables-settings-export-guide {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  margin-block-start: var(--size-4-5);
+  padding: var(--size-4-3);
+}
+
+.structural-tables-settings-export-guide strong {
+  color: var(--text-normal);
+  font-weight: var(--font-semibold);
+}
+
+.structural-tables-settings-export-guide p {
+  margin-block: var(--size-4-2);
+}
+
+.structural-tables-settings-export-guide a:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.structural-tables-settings-save-status {
+  align-items: center;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: space-between;
+  margin-block-end: var(--size-4-3);
+  padding: var(--size-4-2) var(--size-4-3);
+}
+
+.structural-tables-settings-save-status[role="alert"] {
+  border-color: var(--text-error);
+  color: var(--text-error);
+}
+
+.structural-tables-settings-save-status[hidden],
+.structural-tables-settings-save-status button[hidden] {
+  display: none !important;
+}
+
+@media (pointer: coarse) {
+  .structural-tables-live-preview {
+    --structural-table-handle-gutter: 2.75rem;
+    --structural-table-touch-row-height: 2.75rem;
+    --structural-table-control-inset: var(--structural-table-handle-gutter);
+    box-sizing: border-box;
+    /* Keep full row targets inside the editor's visible column. */
+    padding-inline-start: var(--structural-table-control-inset);
+  }
+
+  .structural-tables-row-handle,
+  .structural-tables-column-handle {
+    width: 2.75rem;
+    height: 2.75rem;
+    opacity: 1;
+  }
+
+  .structural-tables-cell-editor {
+    font-size: max(1rem, 16px);
+  }
+
+  .structural-tables-settings .structural-tables-settings-tabs > button.structural-tables-settings-tab {
+    min-block-size: 44px;
+  }
+}
+
+.structural-tables-conversion-preview {
+  max-block-size: min(50vh, 30rem);
+  overflow: auto;
+  padding: var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  white-space: pre;
+  user-select: text;
+}
+
+.structural-tables-gfm-orientation,
+.structural-tables-gfm-modes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  margin-block: var(--size-4-3);
+}
+
+.structural-tables-gfm-orientation select { max-inline-size: 100%; }
+.structural-tables-gfm-preview :is(button, select) { cursor: var(--cursor, default); }
+.structural-tables-gfm-modes button[aria-pressed="true"] {
+  color: var(--text-accent);
+  box-shadow: inset 0 -2px var(--interactive-accent);
+}
+
+.structural-tables-gfm-rendered {
+  max-block-size: min(50vh, 30rem);
+  padding: var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  overflow: auto;
+  user-select: text;
+}
+
+.structural-tables-gfm-preview [hidden] { display: none; }
+.structural-tables-gfm-warnings { padding-inline-start: var(--size-4-5); }
+.structural-tables-gfm-status { color: var(--text-muted); }
+
+.structural-tables-gfm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--size-4-2);
+  padding-block-start: var(--size-4-4);
+  border-block-start: 1px solid var(--background-modifier-border);
+}
+
+.structural-tables-gfm-actions button {
+  max-inline-size: 100%;
+  block-size: auto;
+  min-block-size: var(--input-height);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (pointer: coarse) {
+  .structural-tables-gfm-preview :is(button, select) { min-block-size: 44px; }
+}
+
+.structural-tables-promotion-modal > * {
+  flex-shrink: 0;
+}
+
+.structural-tables-promotion-mapping {
+  max-block-size: 12rem;
+  overflow: auto;
+}
+
+.structural-tables-promotion-content-report,
+.structural-tables-promotion-record-previews {
+  max-block-size: min(42vh, 24rem);
+  overflow: auto;
+  min-inline-size: 0;
+  margin-block: var(--size-4-2);
+}
+
+.structural-tables-promotion-content-item,
+.structural-tables-promotion-record-previews > details {
+  margin-block: var(--size-4-1);
+  overflow-wrap: anywhere;
+}
+
+.structural-tables-promotion-content-source,
+.structural-tables-promotion-content-value,
+.structural-tables-promotion-record-previews pre {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.structural-tables-promotion-acceptance {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-4-2);
+  margin-block: var(--size-4-3);
+  overflow-wrap: anywhere;
+}
+
+.structural-tables-promotion-acceptance > input {
+  flex: none;
+  margin-block-start: 0.2em;
+}
+
+.structural-tables-promotion-warning {
+  margin-block: var(--size-4-3);
+  padding: var(--size-4-3);
+  border-inline-start: 3px solid var(--text-warning);
+  background: var(--background-modifier-warning);
+}
+
+.structural-tables-promotion-blocker {
+  margin-block: var(--size-4-3);
+  padding: var(--size-4-3);
+  border-inline-start: 3px solid var(--text-error);
+  background: color-mix(in srgb, var(--text-error) 12%, transparent);
+  color: var(--text-normal);
+}
+
+.structural-tables-recovered-draft { display: block; width: 100%; margin-block: 0.5rem; }
+
+.structural-tables-cell-editor.is-measuring { height: 0; }
+
+/* These menu actions mean physical left/right even in an RTL interface. */
+.mod-rtl .menu svg.svg-icon:is(
+  .structural-tables-physical-arrow-left-to-line,
+  .structural-tables-physical-arrow-right-to-line,
+  .structural-tables-physical-arrow-left,
+  .structural-tables-physical-arrow-right,
+  .structural-tables-physical-align-left,
+  .structural-tables-physical-align-right
+) {
+  transform: none;
+}
+
+/* Offscreen, non-interactive typography mirror for verified textarea arrow exits. */
+.structural-tables-visual-text-measure {
+  position: fixed;
+  inset-block-start: 0;
+  left: -10000px;
+  visibility: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  width: var(--structural-visual-width);
+  height: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: var(--structural-visual-word-break);
+  font-family: var(--structural-visual-font-family);
+  font-size: var(--structural-visual-font-size);
+  font-weight: var(--structural-visual-font-weight);
+  font-style: var(--structural-visual-font-style);
+  line-height: var(--structural-visual-line-height);
+  letter-spacing: var(--structural-visual-letter-spacing);
+  word-spacing: var(--structural-visual-word-spacing);
+  text-align: var(--structural-visual-text-align);
+  tab-size: var(--structural-visual-tab-size);
+  padding: var(--structural-visual-padding);
+  border: var(--structural-visual-border);
+  direction: var(--structural-visual-direction);
+}
+
+.structural-tables-settings-help {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-4);
+  margin-block: 0 var(--size-4-4);
+}
+
+.structural-tables-settings-help a { cursor: var(--cursor, default); }
