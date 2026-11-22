@@ -1,0 +1,35 @@
+{
+  "nome": "bloco_de_codigo",
+  "anomalia": {
+    "anomalia_id": "anomalia:T05:7",
+    "telhado_id": "T05",
+    "rua_id": "R2",
+    "periodo": 7,
+    "producao_kw": 1.6,
+    "media_vizinhos_kw": 3.0,
+    "desvio_pct": 46.7
+  },
+  "vista": {
+    "producao_telhado_kw": [
+      2.7,
+      2.4,
+      2.0,
+      1.6
+    ],
+    "media_vizinhos_kw": [
+      3.0,
+      3.0,
+      3.0,
+      3.0
+    ],
+    "relatos": [
+      {
+        "periodo": 4,
+        "texto": "Muito pó nos painéis desde as obras na estrada."
+      }
+    ]
+  },
+  "resposta_falsa": "```json\n{\"causa\": \"sujidade\", \"justificacao\": \"descida gradual e relato de po\"}\n```",
+  "resposta_valida_esperada": true,
+  "causa_esperada": "sujidade"
+}

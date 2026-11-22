@@ -1,0 +1,30 @@
+{
+  "nome": "avaria",
+  "anomalia": {
+    "anomalia_id": "anomalia:T09:7",
+    "telhado_id": "T09",
+    "rua_id": "R3",
+    "periodo": 7,
+    "producao_kw": 0.05,
+    "media_vizinhos_kw": 3.0,
+    "desvio_pct": 98.3
+  },
+  "vista": {
+    "producao_telhado_kw": [
+      3.0,
+      3.0,
+      0.05,
+      0.05
+    ],
+    "media_vizinhos_kw": [
+      3.0,
+      3.0,
+      3.0,
+      3.0
+    ],
+    "relatos": []
+  },
+  "resposta_falsa": "{\"causa\": \"avaria\", \"justificacao\": \"producao perto de zero sem relato\"}",
+  "resposta_valida_esperada": true,
+  "causa_esperada": "avaria"
+}

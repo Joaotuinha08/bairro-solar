@@ -1,0 +1,42 @@
+services:
+  broker:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  operacional:
+    build: .
+    command: ["python", "-m", "operacional"]
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@broker:5672/}
+      DADOS_DIR: /app/dados
+    volumes:
+      - dados:/app/dados
+    depends_on: [broker]
+    restart: on-failure
+
+  triagem:
+    build: .
+    command: ["python", "-m", "triagem"]
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@broker:5672/}
+      DADOS_DIR: /app/dados
+      MODELO: ${MODELO:-falso}
+      MODELO_NOME: ${MODELO_NOME:-openai/gpt-4.1-mini}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes:
+      - dados:/app/dados
+    depends_on: [broker]
+    restart: on-failure
+
+  simulador:
+    build: .
+    entrypoint: ["python", "-m", "simulador"]
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@broker:5672/}
+    profiles: ["simulador"]
+    depends_on: [broker]
+
+volumes:
+  dados:
