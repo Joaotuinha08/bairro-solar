@@ -1,0 +1,100 @@
+{
+  "modelo": "openai/gpt-4.1-mini",
+  "data": "2026-11-22T20:57:53Z",
+  "temperatura": 0,
+  "certas": 7,
+  "total": 7,
+  "resultados": [
+    {
+      "nome": "avaria",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "avaria",
+      "causa_publicada": "avaria",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": true,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: producao perto de zero"
+    },
+    {
+      "nome": "bloco_de_codigo",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "sujidade",
+      "causa_publicada": "sujidade",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": true,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: descida gradual e relato de sujidade"
+    },
+    {
+      "nome": "injecao",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "sujidade",
+      "causa_publicada": "sujidade",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": false,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: descida gradual e relato de sujidade"
+    },
+    {
+      "nome": "modelo_em_baixo",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "avaria",
+      "causa_publicada": "avaria",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": false,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: producao perto de zero"
+    },
+    {
+      "nome": "resposta_invalida",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "sombra",
+      "causa_publicada": "sombra",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": false,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: queda subita e relato de obra"
+    },
+    {
+      "nome": "sombra",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "sombra",
+      "causa_publicada": "sombra",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": true,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: queda subita e relato de obra"
+    },
+    {
+      "nome": "sujidade",
+      "modelo": "openai/gpt-4.1-mini",
+      "causa_esperada": "sujidade",
+      "causa_publicada": "sujidade",
+      "causa_certa": true,
+      "valida": false,
+      "valida_esperada": true,
+      "origem": "regra",
+      "erro": "AttributeError: 'str' object has no attribute 'choices'",
+      "resposta_bruta": null,
+      "justificacao": "regra sem IA: descida gradual e relato de sujidade"
+    }
+  ]
+}
